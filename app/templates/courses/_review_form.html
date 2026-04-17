@@ -1,0 +1,50 @@
+{% macro render_review_form(course, rating_choices, user_review) %}
+<section class="review-form mt-5">
+    <h2 class="mb-3 text-center text-uppercase font-weight-bold">Оставить отзыв</h2>
+    {% if not current_user.is_authenticated %}
+        <p class="text-center">
+            Чтобы оставить отзыв, пожалуйста, <a href="{{ url_for('auth.login') }}">войдите в систему</a>.
+        </p>
+    {% elif user_review %}
+        <div class="alert alert-info">
+            <p class="mb-1">
+                <strong>Ваш отзыв</strong> от {{ user_review.created_at.strftime('%d.%m.%Y %H:%M') }} —
+                оценка <strong>{{ user_review.rating }}</strong>
+            </p>
+            <p class="mb-0">{{ user_review.text }}</p>
+        </div>
+    {% else %}
+        <form method="POST" action="{{ url_for('courses.create_review', course_id=course.id) }}" class="mx-auto" style="max-width: 600px;">
+            <div class="mb-3">
+                <label for="rating" class="form-label">Оценка</label>
+                <select class="form-select" id="rating" name="rating">
+                    {% for value, label in rating_choices %}
+                        <option value="{{ value }}" {% if value == 5 %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="text" class="form-label">Текст отзыва</label>
+                <textarea class="form-control" id="text" name="text" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+    {% endif %}
+</section>
+{% endmacro %}
+
+
+{% macro render_review(review) %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <strong>{{ review.user.full_name }}</strong>
+                <div class="text-muted small">{{ review.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+            </div>
+            <div class="badge bg-primary fs-6">Оценка: {{ review.rating }}</div>
+        </div>
+        <p class="mb-0">{{ review.text }}</p>
+    </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% from 'courses/_review_form.html' import render_review_form, render_review with context %}
+{% from 'pagination.html' import render_pagination %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex align-items-center mb-4">
+        <h1>Отзывы к курсу «{{ course.name }}»</h1>
+        <a href="{{ url_for('courses.show', course_id=course.id) }}" class="btn btn-secondary ms-auto">Вернуться к курсу</a>
+    </div>
+
+    <form method="GET" class="row g-2 align-items-end mb-4">
+        <div class="col-auto">
+            <label for="sort" class="form-label">Сортировка</label>
+            <select class="form-select" id="sort" name="sort">
+                {% for value, label in sort_options.items() %}
+                    <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Применить</button>
+        </div>
+    </form>
+
+    {% if reviews %}
+        {% for review in reviews %}
+            {{ render_review(review) }}
+        {% endfor %}
+
+        {{ render_pagination(pagination, 'courses.reviews', {'course_id': course.id, 'sort': sort}) }}
+    {% else %}
+        <p class="text-muted">Отзывов пока нет.</p>
+    {% endif %}
+
+    {{ render_review_form(course, rating_choices, user_review) }}
+</div>
+{% endblock %}
